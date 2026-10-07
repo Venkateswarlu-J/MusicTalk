@@ -1,0 +1,2 @@
+# This file ensures the songs directory exists in git.
+# User-uploaded audio files stored in this folder are ignored by .gitignore.

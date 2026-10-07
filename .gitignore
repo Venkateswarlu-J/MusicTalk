@@ -1,0 +1,134 @@
+# ==============================================================================
+# MusicTalk — Git Ignore Rules
+# ==============================================================================
+data/
+# --- Python & Virtual Environments ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+htmlcov/
+.tox/
+
+# --- Node.js & Frontend ---
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- Environment & Secret Configuration ---
+.env
+.env.*
+*.env
+!.env.example
+!.env.*.example
+!**/.env.example
+
+# Local overrides
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# --- Databases & Local Storage ---
+*.sqlite3
+*.db
+*.sqlite
+*.sql.gz
+
+# --- Runtime Media Uploads ---
+# Ignore user-uploaded runtime audio files, but keep directory structure
+songs/*
+!songs/.gitkeep
+
+# Continuous learning runtime recordings
+recognition-service/continuous_learning/*
+!recognition-service/continuous_learning/.gitkeep
+
+# --- Datasets & Raw Archive Data ---
+IRMAS*
+IRMAS-TrainingData/
+IRMAS-TestingData/
+dataset/
+datasets/
+archive/
+data/openmic-2018/
+data/IRMAS-TrainingData/
+data/processed/
+*.tar.gz
+*.tar
+*.zip
+*.7z
+*.rar
+
+# --- Training artifacts & Heavy Checkpoints ---
+# Keep default pre-trained instrument models in recognition-service/models/
+# but ignore training logs, wandb, tensorboard, checkpoints
+checkpoints/
+runs/
+wandb/
+.tensorboard/
+*.ckpt
+
+# --- IDE & OS Metadata ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# --- Logs ---
+logs/
+*.log

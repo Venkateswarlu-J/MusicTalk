@@ -1,0 +1,100 @@
+services:
+  # MySQL Database for Song Catalog
+  mysql:
+    image: mysql:8.0
+    container_name: musictalk-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: musictalk_catalog
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # AI Instrument Recognition Microservice (PyTorch)
+  recognition-service:
+    build:
+      context: ./recognition-service
+      dockerfile: Dockerfile
+    container_name: musictalk-recognition
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DEVICE=cpu
+      - CONFIDENCE_THRESHOLD=0.50
+
+  # Song Catalog & Audio Management Microservice (FastAPI + MySQL)
+  catalog-service:
+    build:
+      context: ./catalog-service
+      dockerfile: Dockerfile
+    container_name: musictalk-catalog
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=musictalk_catalog
+      - RECOGNITION_SERVICE_URL=http://recognition-service:8000
+    volumes:
+      - ./songs:/songs
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # Music Recommendation Microservice (FastAPI)
+  recommendation-service:
+    build:
+      context: ./recommendation-service
+      dockerfile: Dockerfile
+    container_name: musictalk-recommendation
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    environment:
+      - CATALOG_SERVICE_URL=http://catalog-service:8001
+    depends_on:
+      - catalog-service
+
+  # Unified API Gateway (FastAPI Proxy)
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: musictalk-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - RECOGNITION_SERVICE_URL=http://recognition-service:8000
+      - CATALOG_SERVICE_URL=http://catalog-service:8001
+      - RECOMMENDATION_SERVICE_URL=http://recommendation-service:8002
+    depends_on:
+      - recognition-service
+      - catalog-service
+      - recommendation-service
+
+  # React + Vite Frontend (Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: musictalk-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - gateway
+
+volumes:
+  mysql_data:

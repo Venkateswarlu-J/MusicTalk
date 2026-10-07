@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="musicGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="50%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e1b4b" />
+    </linearGradient>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="50" cy="50" r="46" fill="url(#bgGrad)" stroke="#4338ca" stroke-width="2" />
+
+  <!-- Sound Waves / Equalizer Bars -->
+  <rect x="22" y="42" width="6" height="16" rx="3" fill="url(#musicGrad)" />
+  <rect x="32" y="32" width="6" height="36" rx="3" fill="url(#musicGrad)" />
+  <rect x="42" y="20" width="6" height="60" rx="3" fill="url(#musicGrad)" />
+  <rect x="52" y="28" width="6" height="44" rx="3" fill="url(#musicGrad)" />
+  <rect x="62" y="36" width="6" height="28" rx="3" fill="url(#musicGrad)" />
+  <rect x="72" y="45" width="6" height="10" rx="3" fill="url(#musicGrad)" />
+
+  <!-- Accent Glow Dot -->
+  <circle cx="50" cy="14" r="3" fill="#ec4899" />
+</svg>

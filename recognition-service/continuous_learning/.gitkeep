@@ -1,0 +1,2 @@
+# This file ensures the continuous_learning directory exists in git.
+# Runtime user-feedback audio samples stored here are ignored by .gitignore.
