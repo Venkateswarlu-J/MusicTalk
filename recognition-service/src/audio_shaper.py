@@ -48,9 +48,10 @@ class UniversalAudioShaper:
     def process_audio(self, audio_path: str) -> torch.Tensor:
         """Loads audio, normalizes sample rate, pads/trims to exact duration, extracts Log-Mel."""
         y, sr = librosa.load(audio_path, sr=SAMPLE_RATE, mono=True)
-        # Volume normalization (Peak normalization)
-        if y.max() > 0:
-            y = y / np.max(np.abs(y))
+        # Peak normalization must work for both positive and negative waveforms.
+        peak = float(np.max(np.abs(y))) if y.size else 0.0
+        if peak > 1e-8:
+            y = y / peak
 
         # We reuse the exact extraction logic the live inference uses
         return extract_features_from_audio(y, sr)
@@ -116,24 +117,33 @@ class UniversalAudioShaper:
             logger.error(f"Failed to read OpenMIC CSV: {e}")
             return
 
-        # Group by sample_key
-        # OpenMIC: relevance >= 0.5 denotes positive instrument presence
+        # OpenMIC labels are not exhaustive: finite relevance values are known labels,
+        # while blank/NaN relevance values are unknown and must be masked during training.
         audio_labels = {}
         for _, row in df.iterrows():
-            sample_key = str(row['sample_key'])
-            instrument = str(row['instrument'])
-            relevance = float(row.get('relevance', 0.0))
+            sample_key = str(row.get("sample_key", "")).strip()
+            instrument = str(row.get("instrument", "")).strip()
+            if not sample_key or not instrument:
+                continue
+            standard_label = normalize_label(instrument, self.mapping)
+            raw_relevance = row.get("relevance")
+            try:
+                relevance = float(raw_relevance)
+            except (TypeError, ValueError):
+                relevance = float("nan")
+            if sample_key not in audio_labels:
+                audio_labels[sample_key] = {}
+            if not np.isfinite(relevance):
+                audio_labels[sample_key][standard_label] = "unknown"
+            else:
+                audio_labels[sample_key][standard_label] = "positive" if relevance >= 0.5 else "negative"
 
-            if relevance >= 0.5:
-                standard_label = normalize_label(instrument, self.mapping)
-                if sample_key not in audio_labels:
-                    audio_labels[sample_key] = set()
-                audio_labels[sample_key].add(standard_label)
+        logger.info(f"Found {len(audio_labels)} OpenMIC clips with label-state records.")
 
-        logger.info(f"Found {len(audio_labels)} clips with positive instrument labels in OpenMIC.")
-
-        # Process each audio clip
-        for sample_key, labels in tqdm(audio_labels.items(), desc="Shaping OpenMIC"):
+        # Keep every clip with annotation rows, including clips with known negatives
+        # but no positives. Per-instrument training masks unknown states later.
+        for sample_key, label_states in tqdm(audio_labels.items(), desc="Shaping OpenMIC"):
+            labels = [name for name, state in label_states.items() if state == "positive"]
             subfolder = sample_key[:3]
             file_name = f"{sample_key}.ogg"
             file_path = os.path.join(audio_dir, subfolder, file_name)
@@ -151,7 +161,8 @@ class UniversalAudioShaper:
                     "source": "OpenMIC",
                     "audio_path": file_path,
                     "tensor_file": save_name,
-                    "instrument_labels": list(labels)
+                    "instrument_labels": labels,
+                    "label_states": label_states
                 })
             except Exception as e:
                 logger.error(f"Failed to process OpenMIC {file_path}: {e}")

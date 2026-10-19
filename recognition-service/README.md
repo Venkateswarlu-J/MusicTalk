@@ -43,3 +43,28 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 - `GET /health` — Check service status and list active detectors
 - `POST /recognize` — Multipart upload of audio file (`.wav`, `.mp3`, etc.)
 - `POST /admin/reload-models` — Reload model checkpoints from disk without server restart
+
+### Unified dataset validation and safe candidate training
+
+Run these commands from the `recognition-service` directory after shaping the datasets:
+
+```bash
+python -m src.audio_shaper --data-root ../dataset --output-dir ../data/processed --mapping data/instrument_mapping.json
+python -m src.validate_dataset --data-dir ../data/processed
+python -m src.train_unified --instrument piano --data-dir ../data/processed --output-dir models/candidates --device auto
+```
+
+Place raw datasets under the expected folders `dataset/IRMAS-TrainingData/` and
+`dataset/openmic-2018/`. The OpenMIC folder must contain
+`openmic-2018-aggregated-labels.csv` and `audio/`. Confirm the actual local paths
+before running; these are example relative paths, not an assertion about your machine.
+
+OpenMIC relevance values are handled as positive (`>= 0.5`) or negative (`< 0.5`);
+missing/non-numeric relevance is unknown. Unknown labels are excluded from that
+instrument's binary training and validation data. Old manifests without OpenMIC
+`label_states` are rejected by the trainer because their absent labels cannot safely
+be interpreted as negatives.
+
+Training writes timestamped `*_candidate_*.pt` files to the candidate directory.
+It does not overwrite or promote any checkpoint under `models/`. Review the
+candidate and its validation results before any explicit promotion.
