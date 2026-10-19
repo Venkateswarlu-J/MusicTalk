@@ -132,3 +132,6 @@ Thumbs.db
 # --- Logs ---
 logs/
 *.log
+
+# Locally trained candidate models must not be committed by default
+recognition-service/models/candidates/
