@@ -49,7 +49,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 Run these commands from the `recognition-service` directory after shaping the datasets:
 
 ```bash
-python -m src.audio_shaper --data-root ../dataset --output-dir ../data/processed --mapping ../data/instrument_mapping.json
+python -m src.audio_shaper --data-root ../dataset --output-dir ../data/processed --mapping data/instrument_mapping.json
 python -m src.validate_dataset --data-dir ../data/processed
 python -m src.train_unified --instrument piano --data-dir ../data/processed --output-dir models/candidates --device auto
 ```
