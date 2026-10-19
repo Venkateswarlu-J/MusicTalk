@@ -1,0 +1,78 @@
+{
+  "acoustic_guitar": [
+    "acoustic guitar",
+    "guitar",
+    "gac",
+    "acoustic_guitar"
+  ],
+  "bass": [
+    "bass",
+    "electric bass",
+    "bass guitar",
+    "bas"
+  ],
+  "cello": [
+    "cello",
+    "cel"
+  ],
+  "clarinet": [
+    "clarinet",
+    "cla"
+  ],
+  "drums": [
+    "drums",
+    "drum kit",
+    "percussion"
+  ],
+  "electric_guitar": [
+    "electric guitar",
+    "gel",
+    "electric_guitar"
+  ],
+  "flute": [
+    "flute",
+    "flu"
+  ],
+  "mallet_percussion": [
+    "mallet percussion",
+    "xylophone",
+    "marimba",
+    "glockenspiel"
+  ],
+  "organ": [
+    "organ",
+    "org",
+    "church organ"
+  ],
+  "piano": [
+    "piano",
+    "pia"
+  ],
+  "saxophone": [
+    "saxophone",
+    "sax"
+  ],
+  "synthesizer": [
+    "synthesizer",
+    "synth",
+    "keyboard"
+  ],
+  "trumpet": [
+    "trumpet",
+    "tru"
+  ],
+  "violin": [
+    "violin",
+    "vio"
+  ],
+  "voice": [
+    "voice",
+    "vocals",
+    "singing",
+    "voi"
+  ],
+  "cymbals": [
+    "cymbals",
+    "cymbal"
+  ]
+}
