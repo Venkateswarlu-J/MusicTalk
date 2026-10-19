@@ -140,14 +140,10 @@ class UniversalAudioShaper:
 
         logger.info(f"Found {len(audio_labels)} OpenMIC clips with label-state records.")
 
-        # Process each audio clip; skip clips with no known positive labels.
+        # Keep every clip with annotation rows, including clips with known negatives
+        # but no positives. Per-instrument training masks unknown states later.
         for sample_key, label_states in tqdm(audio_labels.items(), desc="Shaping OpenMIC"):
             labels = [name for name, state in label_states.items() if state == "positive"]
-            if not labels:
-                # A clip may still contain useful known negatives, but keeping only clips
-                # with at least one positive avoids writing mostly unlabeled audio here.
-                # The validator/trainer still supports negative states for every retained clip.
-                continue
             subfolder = sample_key[:3]
             file_name = f"{sample_key}.ogg"
             file_path = os.path.join(audio_dir, subfolder, file_name)
